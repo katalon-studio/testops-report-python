@@ -3,5 +3,6 @@
 /.pytest_cache/
 /build/
 /dist/
-/katalon_testops_reporter.egg-info/
+/testops_reporter.egg-info/
 *.DS_Store
+/.vscode/
