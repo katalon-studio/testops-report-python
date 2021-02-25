@@ -5,12 +5,12 @@ from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Module
 from _pytest.reports import TestReport, CollectReport
-from testops_commons.katalon.testops.commons.helper.helper import generate_unique_value
-from testops_commons.katalon.testops.commons.model.models import TestSuite
-from testops_commons.katalon.testops.commons.report_lifecycle import ReportLifecycle
+from testops_commons.helper.helper import generate_unique_value
+from testops_commons.model.models import TestSuite
+from testops_commons.report_lifecycle import ReportLifecycle
 
-from testops_reporter.katalon.testops.pytest.report import helper
-from testops_reporter.katalon.testops.pytest.report.helper import TestSuiteWrapper, TestCaseWrapper
+from testops_reporter import helper
+from testops_reporter.helper import TestSuiteWrapper, TestCaseWrapper
 
 STEP_SETUP: str = 'setup'
 STEP_CALL: str = 'call'
