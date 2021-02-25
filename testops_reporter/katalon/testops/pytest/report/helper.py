@@ -20,7 +20,7 @@ class TestCaseWrapper(object):
 class TestSuiteWrapper(object):
     module: Module
     started: bool
-    testcases: list[TestCaseWrapper]
+    testcases: list
     uuid: str
 
     def __init__(self, module: Module):
@@ -60,7 +60,7 @@ def create_test_result(tc: TestCaseWrapper, ts: TestSuiteWrapper, report: TestRe
     result.parent_uuid = ts.uuid
 
     if result.status == Status.SKIPPED:
-        result.errors.append(Error(_get_skip_message(report)))
+        result.errors.append(Error(_get_skip_message(report), ""))
     if (result.status == Status.FAILED) or (result.status == Status.ERROR):
         result.errors.append(Error(report.longreprtext, report.longreprtext))
     return result

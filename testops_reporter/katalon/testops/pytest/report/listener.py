@@ -1,4 +1,4 @@
-from typing import Union, Optional, Tuple
+from typing import Union, Tuple
 
 from _pytest.config import Config, ExitCode
 from _pytest.main import Session
@@ -9,15 +9,15 @@ from testops_commons.katalon.testops.commons.helper.helper import generate_uniqu
 from testops_commons.katalon.testops.commons.model.models import TestSuite
 from testops_commons.katalon.testops.commons.report_lifecycle import ReportLifecycle
 
-from katalon.testops.pytest.report import helper
-from katalon.testops.pytest.report.helper import TestSuiteWrapper, TestCaseWrapper
+from testops_reporter.katalon.testops.pytest.report import helper
+from testops_reporter.katalon.testops.pytest.report.helper import TestSuiteWrapper, TestCaseWrapper
 
 STEP_SETUP: str = 'setup'
 STEP_CALL: str = 'call'
 
 report_lifecycle: ReportLifecycle = ReportLifecycle()
 
-testsuites: list[TestSuiteWrapper] = []
+testsuites: list = []
 
 
 def pytest_sessionstart(session: Session) -> None:
@@ -27,7 +27,7 @@ def pytest_sessionstart(session: Session) -> None:
     pass
 
 
-def pytest_collection_modifyitems(session: Session, config: Config, items: list[Item]) -> None:
+def pytest_collection_modifyitems(session: Session, config: Config, items: list) -> None:
     """ Read all testcases of testsuite """
     build_testsuite(items)
     pass
@@ -59,7 +59,7 @@ def pytest_sessionfinish(session: Session, exitstatus: Union[int, ExitCode]) -> 
     testsuites.clear()
 
 
-def build_testsuite(items: list[Item]):
+def build_testsuite(items: list):
     """
     build test hierarchy
     """
