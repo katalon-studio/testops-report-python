@@ -1,7 +1,7 @@
 from _pytest.python import Function, Module
 from _pytest.reports import TestReport
-from testops_commons.helper.helper import generate_unique_value
-from testops_commons.model.models import Metadata, TestResult, Status, Error
+from testops_commons import (Error, Metadata, Status, TestResult,
+                             generate_unique_value)
 
 
 class TestCaseWrapper(object):

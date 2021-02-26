@@ -1,16 +1,14 @@
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 from _pytest.config import Config, ExitCode
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Module
-from _pytest.reports import TestReport, CollectReport
-from testops_commons.helper.helper import generate_unique_value
-from testops_commons.model.models import TestSuite
-from testops_commons.report_lifecycle import ReportLifecycle
+from _pytest.reports import CollectReport, TestReport
+from testops_commons import ReportLifecycle, TestSuite, generate_unique_value
 
 from testops_reporter import helper
-from testops_reporter.helper import TestSuiteWrapper, TestCaseWrapper
+from testops_reporter.helper import TestCaseWrapper, TestSuiteWrapper
 
 STEP_SETUP: str = 'setup'
 STEP_CALL: str = 'call'
