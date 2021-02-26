@@ -56,8 +56,8 @@ def create_test_result(tc: TestCaseWrapper, ts: TestSuiteWrapper, report: TestRe
     result.uuid = uuid
     result.status = _get_status(report)
     result.name = tc.module.nodeid
-    result.suite_name = ts.module.nodeid
-    result.parent_uuid = ts.uuid
+    result.suiteName = ts.module.nodeid
+    result.parentUuid = ts.uuid
 
     if result.status == Status.SKIPPED:
         result.errors.append(Error(_get_skip_message(report), ""))
