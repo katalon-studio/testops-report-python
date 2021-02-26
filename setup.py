@@ -14,10 +14,9 @@ setuptools.setup(
     url="https://github.com/katalon-studio/testops-report-python",
     packages=setuptools.find_packages(),
     classifiers=[
-        "Katalon",
-        "TestOps"
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
+    keywords=["Katalon", "TestOps"],
     python_requires='>=3.6',
 )

@@ -34,4 +34,4 @@ jobs:
           PYPI_PASS: ${{ secrets.PYPI_PASS }}
         run: |
           python3 -m pip install --upgrade twine
-          twine upload dist/* -u "$PYPI_USER" -p "$PYPI_PASS"
+          python3 -m twine upload dist/* -u "$PYPI_USER" -p "$PYPI_PASS"
