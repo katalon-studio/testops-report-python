@@ -3,6 +3,10 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+REQUIRES=[
+    "testops-commons"
+]
+
 setuptools.setup(
     name="testops-reporter",
     version="1.0.0",
@@ -19,4 +23,5 @@ setuptools.setup(
     ],
     keywords=["Katalon", "TestOps"],
     python_requires='>=3.6',
+    install_requires=REQUIRES
 )
