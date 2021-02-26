@@ -7,8 +7,8 @@ from _pytest.python import Module
 from _pytest.reports import CollectReport, TestReport
 from testops_commons import ReportLifecycle, TestSuite, generate_unique_value
 
-from testops_reporter import helper
-from testops_reporter.helper import TestCaseWrapper, TestSuiteWrapper
+from testops_pytest import helper
+from testops_pytest.helper import TestCaseWrapper, TestSuiteWrapper
 
 STEP_SETUP: str = 'setup'
 STEP_CALL: str = 'call'

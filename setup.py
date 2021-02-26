@@ -8,7 +8,7 @@ REQUIRES=[
 ]
 
 setuptools.setup(
-    name="testops-reporter",
+    name="testops-pytest",
     version="1.0.0",
     author="Katalon, LLC. (https://www.katalon.io)",
     author_email="info@katalon.io",

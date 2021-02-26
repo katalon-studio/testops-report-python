@@ -6,3 +6,4 @@
 /testops_reporter.egg-info/
 *.DS_Store
 /.vscode/
+*.egg-info
