@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple, Union
 
 from _pytest.config import Config, ExitCode
@@ -17,44 +18,68 @@ report_lifecycle: ReportLifecycle = ReportLifecycle()
 
 testsuites: list = []
 
+logger = logging.getLogger(__name__)
+
 
 def pytest_sessionstart(session: Session) -> None:
     """ Start the test """
-    report_lifecycle.start_execution()
-    report_lifecycle.write_metadata(helper.create_metadata())
+    try:
+        logger.info(msg="TestOps report started.")
+        report_lifecycle.start_execution()
+        report_lifecycle.write_metadata(helper.create_metadata())
+    except Exception:
+        _log_internal_error()
     pass
 
 
 def pytest_collection_modifyitems(session: Session, config: Config, items: list) -> None:
     """ Read all testcases of testsuite """
-    build_testsuite(items)
+    try:
+        build_testsuite(items)
+    except Exception:
+        _log_internal_error()
     pass
 
 
 def pytest_runtest_call(item: Item):
-    ts: TestSuiteWrapper = get_testsuite(item.parent)
-    if ts.started:
-        return
-    handle_start_testsuite(ts)
+    """
+    Call before calling each item.
+    Used to detect testsuite started.
+    """
+    try:
+        ts: TestSuiteWrapper = get_testsuite(item.parent)
+        if ts.started:
+            return
+        handle_start_testsuite(ts)
+    except Exception:
+        _log_internal_error()
 
 
 def pytest_runtest_logreport(report: Union[TestReport, CollectReport]) -> None:
     """ Report for testcase/testsuite """
-    if isinstance(report, TestReport):
-        handle_testreport(report)
-    else:
-        handle_collectreport(report)
+    try:
+        if isinstance(report, TestReport):
+            handle_testreport(report)
+        else:
+            handle_collectreport(report)
+    except Exception:
+        _log_internal_error()
 
 
 def pytest_sessionfinish(session: Session, exitstatus: Union[int, ExitCode]) -> None:
     """ End the test """
-    report_lifecycle.stop_execution()
-    report_lifecycle.write_test_results_report()
-    report_lifecycle.write_test_suites_report()
-    report_lifecycle.write_execution_report()
-    report_lifecycle.reset()
-    report_lifecycle.upload()
-    testsuites.clear()
+    try:
+        logger.info(msg="Processing test result...")
+        report_lifecycle.stop_execution()
+        report_lifecycle.write_test_results_report()
+        report_lifecycle.write_test_suites_report()
+        report_lifecycle.write_execution_report()
+        report_lifecycle.reset()
+        logger.info(msg="Uploading report to TestOps...")
+        report_lifecycle.upload()
+        testsuites.clear()
+    except Exception:
+        _log_internal_error()
 
 
 def build_testsuite(items: list):
@@ -117,6 +142,7 @@ def handle_start_testcase(report: TestReport) -> None:
 
 
 def handle_end_testcase(report: TestReport) -> None:
+    logger.info("TestCase finished: " + report.nodeid)
     rel = get_testcase(report.nodeid)
     if rel is None:
         return
@@ -128,6 +154,7 @@ def handle_end_testcase(report: TestReport) -> None:
 
 
 def handle_testcase_skipped(report: TestReport) -> None:
+    logger.info("TestCase skipped: " + report.nodeid)
     rel = get_testcase(report.nodeid)
     if rel is None:
         return
@@ -146,6 +173,7 @@ def handle_stop_testcase(ts: TestSuiteWrapper, tc: TestCaseWrapper, report: Test
 
 
 def handle_start_testsuite(ts: TestSuiteWrapper):
+    logger.info("TestSuite started: " + ts.module.nodeid)
     uuid = generate_unique_value()
     ts.uuid = uuid
     ts.started = True
@@ -156,6 +184,11 @@ def handle_start_testsuite(ts: TestSuiteWrapper):
 
 
 def handle_end_testsuite(ts: TestSuiteWrapper):
+    logger.info("TestSuite started: " + ts.module.nodeid)
     if not ts.finished:
         return
     report_lifecycle.stop_test_suite(ts.uuid)
+
+
+def _log_internal_error():
+    logger.info(msg="An error has occurred in testops-pytest plugin.")
