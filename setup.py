@@ -9,7 +9,7 @@ REQUIRES=[
 
 setuptools.setup(
     name="testops-pytest",
-    version="1.0.0",
+    version="1.0.2",
     author="Katalon, LLC. (https://www.katalon.io)",
     author_email="info@katalon.io",
     description="Katalon TestOps PyTest Plugin",

@@ -1,6 +1,8 @@
 import logging
+from logging import DEBUG, StreamHandler
 from typing import Tuple, Union
 
+import testops_commons
 from _pytest.config import Config, ExitCode
 from _pytest.main import Session
 from _pytest.nodes import Item
@@ -18,13 +20,12 @@ report_lifecycle: ReportLifecycle = ReportLifecycle()
 
 testsuites: list = []
 
-logger = logging.getLogger(__name__)
+logger = testops_commons.get_logger(__name__)
 
 
 def pytest_sessionstart(session: Session) -> None:
     """ Start the test """
     try:
-        logger.info(msg="TestOps report started.")
         is_parallel = _is_parallel(session)
         if is_parallel:
             report_lifecycle.set_parallel(True)
