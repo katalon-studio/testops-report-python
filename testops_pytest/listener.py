@@ -1,6 +1,8 @@
 import logging
+from logging import DEBUG, StreamHandler
 from typing import Tuple, Union
 
+import testops_commons
 from _pytest.config import Config, ExitCode
 from _pytest.main import Session
 from _pytest.nodes import Item
@@ -18,16 +20,23 @@ report_lifecycle: ReportLifecycle = ReportLifecycle()
 
 testsuites: list = []
 
-logger = logging.getLogger(__name__)
+logger = testops_commons.get_logger(__name__)
 
 
 def pytest_sessionstart(session: Session) -> None:
     """ Start the test """
     try:
-        logger.info(msg="TestOps report started.")
+        is_parallel = _is_parallel(session)
+        if is_parallel:
+            report_lifecycle.set_parallel(True)
         report_lifecycle.start_execution()
+        if not _is_parallel(session):
+            report_lifecycle.clean_report_dir()
+        if _is_xdist_master(session):
+            report_lifecycle.clean_report_dir()
+            report_lifecycle.write_global_execution_uuid(report_lifecycle.current_execution)
         report_lifecycle.write_metadata(helper.create_metadata())
-    except Exception:
+    except Exception as e:
         _log_internal_error()
     pass
 
@@ -70,16 +79,24 @@ def pytest_sessionfinish(session: Session, exitstatus: Union[int, ExitCode]) -> 
     """ End the test """
     try:
         logger.info(msg="Processing test result...")
+        _handle_end_testsuite_on_parallel()
         report_lifecycle.stop_execution()
         report_lifecycle.write_test_results_report()
         report_lifecycle.write_test_suites_report()
         report_lifecycle.write_execution_report()
-        report_lifecycle.reset()
         logger.info(msg="Uploading report to TestOps...")
-        report_lifecycle.upload()
+        if (not _is_parallel(session)) or _is_xdist_master(session):
+            report_lifecycle.upload()
+        report_lifecycle.reset()
         testsuites.clear()
-    except Exception:
+    except Exception as e:
         _log_internal_error()
+
+
+def _handle_end_testsuite_on_parallel():
+    for ts in testsuites:
+        if not ts.finished:
+            handle_end_testsuite(ts, True)
 
 
 def build_testsuite(items: list):
@@ -183,12 +200,32 @@ def handle_start_testsuite(ts: TestSuiteWrapper):
     report_lifecycle.start_suite(testsuite, uuid)
 
 
-def handle_end_testsuite(ts: TestSuiteWrapper):
+def handle_end_testsuite(ts: TestSuiteWrapper, force=False):
     logger.info("TestSuite started: " + ts.module.nodeid)
-    if not ts.finished:
+    if not ts.finished and not force:
         return
     report_lifecycle.stop_test_suite(ts.uuid)
 
 
 def _log_internal_error():
     logger.info(msg="An error has occurred in testops-pytest plugin.")
+
+
+def _is_xdist_master(session):
+    try:
+        from xdist import is_xdist_master
+        return is_xdist_master(session)
+    except Exception:
+        return False
+
+
+def _is_xdist_worker(session):
+    try:
+        from xdist import is_xdist_worker
+        return is_xdist_worker(session)
+    except Exception:
+        return False
+
+
+def _is_parallel(session):
+    return _is_xdist_worker(session) or _is_xdist_master(session)
